@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% block title %} 關稅分析與報導 {% endblock %}
+{% block content %}
+<div class="col-lg-12">
+  <h1>關稅分析與報導</h1>
+  <p>本頁面將展示最新的關於關稅的關鍵字雲圖與時間趨勢。</p>
+</div>
+
+<div class="col-lg-12 mb-3">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="h6 text-uppercase mb-0">篩選條件</h3>
+    </div>
+    <div class="card-body">
+      <form method="get" action="{% url 'app_tariff:home' %}">
+        <!-- 新聞類別 Radio Buttons -->
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">新聞類別</label>
+          <div class="col-md-10">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" value="" name="category" id="cat_all"
+                {% if not category_filter %}checked{% endif %}>
+              <label class="form-check-label" for="cat_all">全部</label>
+            </div>
+            {% for category in categories %}
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" value="{{ category.name }}" name="category"
+                       id="cat_{{ forloop.counter }}"
+                       {% if category.name == category_filter %}checked{% endif %}>
+                <label class="form-check-label" for="cat_{{ forloop.counter }}">{{ category.name }}</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- 日期篩選 -->
+        <div class="row mb-3">
+          <label class="col-sm-2 col-form-label">起始日期</label>
+          <div class="col-sm-3">
+            <input type="date" name="start_date" value="{{ start_date }}" class="form-control" />
+          </div>
+          <label class="col-sm-2 col-form-label">結束日期</label>
+          <div class="col-sm-3">
+            <input type="date" name="end_date" value="{{ end_date }}" class="form-control" />
+          </div>
+
+          <div class="col-sm-2 text-end">
+            <button type="submit" class="btn btn-primary">篩選</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 雲圖 -->
+<div class="col-lg-12 mb-3">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="h6 text-uppercase mb-0">熱門關鍵字雲圖</h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div id="keyword_cloud">
+          <canvas id="keyword_cloud_canvas" width="1250" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 時間趨勢圖 -->
+<div class="col-lg-12 mb-3">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="h6 text-uppercase mb-0">時間趨勢：關稅新聞篇數與提及次數</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="timeSeriesChart" width="800" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.1.0/src/wordcloud2.min.js"></script>
+
+<script>
+  const keywords = {{ keywords | safe }};
+  const categories = {{ categories | safe }};
+  const timeSeriesData = JSON.parse('{{ time_series_data|escapejs }}');
+
+  function displayKeywordAnalysis() {
+    let html_snippet = `
+      <h5>熱門關鍵字:</h5>
+      <ul>
+        ${keywords.map(keyword => `<li><a href="#${keyword[0]}">${keyword[0]} (${keyword[1]})</a></li>`).join('')}
+      </ul>
+    `;
+    document.getElementById("keyword_analysis").innerHTML = html_snippet;
+  }
+
+  function drawCategoryDistributionChart() {
+    let data = {
+      labels: categories.map(cat => cat.name),
+      datasets: [{
+        label: "關稅報導量",
+        data: categories.map(cat => cat.count),
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    };
+    const ctx = document.getElementById('category_distribution_chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: data,
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: { beginAtZero: true }
+          }]
+        }
+      }
+    });
+  }
+
+  function drawKeywordCloud() {
+    const canvas = document.getElementById('keyword_cloud_canvas');
+    const wordList = keywords.map(([word, freq]) => [word, freq]);
+
+    WordCloud(canvas, {
+      list: wordList,
+      gridSize: 10,
+      weightFactor: 2,
+      fontFamily: 'Arial',
+      color: 'random-dark',
+      rotateRatio: 0.5,
+      backgroundColor: '#f9f9f9',
+      click: function(item) {
+        if (item) {
+          window.location.href = `#${item[0]}`;
+        }
+      }
+    });
+  }
+
+  function drawTimeSeriesChart() {
+  const labels = timeSeriesData.dates;
+  const articleCounts = timeSeriesData.article_counts;
+  const keywordMentions = timeSeriesData.keyword_mentions;
+
+  const ctx = document.getElementById('timeSeriesChart').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '關稅新聞篇數',
+          data: articleCounts,
+          backgroundColor: 'rgba(255, 159, 64, 0.6)',
+          yAxisID: 'y-axis-1',
+        },
+        {
+          label: '關鍵字總提及次數',
+          data: keywordMentions,
+          type: 'line',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          yAxisID: 'y-axis-2',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        yAxes: [
+          {
+            id: 'y-axis-1',
+            position: 'left',
+            ticks: {
+              beginAtZero: true
+            },
+            scaleLabel: {
+              display: true,
+              labelString: '篇數'
+            }
+          },
+          {
+            id: 'y-axis-2',
+            position: 'right',
+            ticks: {
+              beginAtZero: true
+            },
+            scaleLabel: {
+              display: true,
+              labelString: '關鍵字次數'
+            },
+            gridLines: {
+              drawOnChartArea: false
+            }
+          }
+        ],
+        xAxes: [{
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: 15
+          }
+        }]
+      },
+      tooltips: {
+        mode: 'index',
+        intersect: false
+      }
+    }
+  });
+}
+
+function call_ajax() {
+    const userkey = $("#input_keyword").val();
+    const weeks = $("input[name='wkradio']:checked").val();
+    const cate = $("input[name='cateradio']:checked").val();
+    const cond = $("input[name='condradio']:checked").val();
+
+    if (userkey.length < 2) {
+      alert("輸入關鍵字不可空白或小於兩個中文字!");
+      return 0;
+    }
+    $.ajax({
+      type: "POST",
+      url: "api_get_userkey_associate/",
+      data: {
+        userkey: userkey,
+        cate: cate,
+        weeks: weeks,
+        cond: cond,
+      },
+      success: function (received) {
+        console.log(received); 
+        
+        // 顯示篩選後的資料
+        const num_articles = received["num_articles"];
+        $("#num_articles").empty();
+        $("#num_articles").append("<h2 style='color:red'>總篇數(Top 30):"+num_articles+"</h2>");
+        
+        // 顯示新聞標題與連結
+        const newslinks = received["newslinks"];
+        $("#newslinks").empty();
+        if (newslinks.length == 0) {
+          alert("No result returned!");
+        }
+        for (let i = 0; i < newslinks.length; i++) {
+          const items =
+            '<li class="list-group-item py-2 border-bottom">' +
+            '<div class="d-flex align-items-center">' +
+            '<span class="badge bg-secondary me-2 px-2 py-1">' + newslinks[i].category + '</span>' +
+            '<a href="' + newslinks[i].link + '" class="text-decoration-none" target="_blank">' +
+            newslinks[i].title +
+            '</a>' +
+            '</div>' +
+            '</li>';
+          $("#newslinks").append(items);
+        }
+
+        // 顯示相關字詞
+        const related_words = received["related_words"];
+        $("#related_words").empty();
+        for (let i = 0; i < related_words.length; i++) {
+          const items = "<li>" + related_words[i] + "</li>";
+          $("#related_words").append(items);
+        }
+
+        // 顯示包含用戶關鍵字的段落
+        const same_paragraph = received["same_paragraph"];
+        const num_paragraphs = received["num_paragraphs"];
+        $("#same_paragraph").empty();
+        $("#same_paragraph").append("<h2 style='color:red'>總段落數(Top 30):"+num_paragraphs+"</h2>");
+        for (let i = 0; i < same_paragraph.length; i++) {
+          const msg = "<li class='list-group-item py-2 border-bottom'>" + same_paragraph[i] + "</li>";
+          $("#same_paragraph").append(msg);
+        }
+
+        // 顯示字詞雲
+        topWordToDraw = received.clouddata;
+        $("#cloud").empty();
+        drawCloud(topWordToDraw, "#cloud");
+      },
+      error: function (msg, status) {
+        console.log(msg);
+        console.log(status);
+      }
+    });
+}
+
+  // 初始化
+  drawTimeSeriesChart();
+  drawKeywordCloud();
+</script>
+
+{% endblock %}
