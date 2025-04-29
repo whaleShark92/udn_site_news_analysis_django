@@ -73,7 +73,7 @@
                     <button
                       type="button"
                       class="btn dropdown-toggle"
-                      style="color: yellow"
+                      style="color: white"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
@@ -93,11 +93,12 @@
                     </div>
                   </div>
 
+                  <!-- 進階自訂分析 -->
                   <div class="btn-group">
                     <button
                       type="button"
                       class="btn dropdown-toggle"
-                      style="color: yellow"
+                      style="color: white"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
@@ -133,11 +134,35 @@
                     href="{% url 'app_presidents:home' %}"
                     >聲量觀測站</a
                   >
-                  <a
-                    class="dropdown-item"
-                    href="{% url 'app_user_keyword_db:home' %}"
-                    >自訂全文檢索與關聯分析db</a
-                  >
+                  <!-- 使用資料庫 -->
+                  <div class="btn-group">
+                    <button
+                      type="button"
+                      class="btn dropdown-toggle"
+                      style="color: white"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      使用DB
+                    </button>
+                    <div class="dropdown-menu">
+                      <a
+                        class="dropdown-item"
+                        href="{% url 'app_user_keyword_db:home' %}"
+                        >自訂全文檢索與關聯分析db</a
+                      >
+                      <a
+                        class="dropdown-item"
+                        href="{% url 'app_top_person_db:home' %}"
+                        >熱門人物(從資料庫查詢)</a
+                      >
+                      <a
+                        class="dropdown-item"
+                        href="{% url 'app_top_person_db:calculate_top_person' %}"
+                        >熱門人物立刻計算(管理者定時執行)</a
+                      >
+                    </div>
+                  </div>
 
                   {% comment %}
                   <!-- 基礎熱門分析 -->

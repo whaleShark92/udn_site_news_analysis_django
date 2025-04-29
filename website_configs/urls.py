@@ -37,6 +37,8 @@ urlpatterns = [
     path('presidents/', include('app_presidents.urls')),
     # full text search and associated keyword display using db
     path('userkeyword_db/', include('app_user_keyword_db.urls')),
+    # full text search and associated keyword display using db
+    path('topperson_db/', include('app_top_person_db.urls')),    
     # admin 後台資料庫管理
     path('admin/', admin.site.urls),
 
