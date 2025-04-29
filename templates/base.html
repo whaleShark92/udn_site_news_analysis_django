@@ -16,8 +16,9 @@
       rel="stylesheet"
     />
     <style>
+      {% comment %} #260224 #365959 #F2F2F0 #F2E2CE #A65233 {% endcomment %}
       body {
-        background-color: #f5f6fa;
+        background-color: #F2F2F0;
         font-family: "Noto Sans TC", sans-serif;
       }
       .custom-container {
@@ -29,18 +30,88 @@
         margin-bottom: 40px;
       }
       .navbar-custom {
-        background-color: #343a40 !important;
+        background-color: #365959;
       }
-      .navbar-custom .navbar-brand,
       .navbar-custom .nav-link,
-      .navbar-custom .dropdown-item {
+      .navbar-custom .dropdown-item,
+      .navbar-custom .btn-dropdown-css {
+        color: #ffffff  ;
+        background-color: #365959 !important;
+        border: none;
+      }
+      .navbar-custom .nav-link:hover,
+      .navbar-custom .dropdown-item:hover,
+      .navbar-custom .btn-dropdown-css:hover {
+        background-color: #260224 !important;
         color: #ffffff !important;
+        opacity: 0.9;
       }
       .navbar-custom .dropdown-menu {
-        background-color: #495057;
+        background-color: #365959;
+        border: none;
       }
-      .navbar-custom .dropdown-item:hover {
-        background-color: #6c757d;
+      .navbar-custom .dropdown-menu .dropdown-item {
+        background-color: #365959;
+        color: #ffffff ;
+      }
+      .navbar-custom .dropdown-menu .dropdown-item:hover {
+        background-color: #365959;
+      }
+      .card {
+        background-color: #F2F2F0;
+        border: 1px solid #365959;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(38, 2, 36, 0.4);
+      }
+
+      .card-header {
+        background-color: #365959;
+        color: #F2F2F0;
+        padding: 10px 15px;
+      }
+
+      .form-control {
+        background-color: #F2E2CE;
+        border: 1px solid #A65233;
+        color: #260224;
+      }
+
+      .form-check-label,
+      .col-form-label {
+        color: #260224;
+      }
+
+      .form-text {
+        color: #A65233;
+      }
+
+      .btn-primary {
+        background-color: #A65233;
+        border: none;
+        color: #F2F2F0;
+      }
+
+      .btn-primary:hover {
+        background-color: #832f1a;
+      }
+
+      .list-group-item {
+        background-color: #F2F2F0;
+        color: #260224;
+        border-color: #365959;
+      }
+
+      h2, h6 {
+        color: #F2F2F0;
+      }
+
+      label {
+        color: #260224;
+      }
+
+      canvas {
+        background-color: #ffffff;
+        border-radius: 5px;
       }
     </style>
 
@@ -72,8 +143,7 @@
                   <div class="btn-group">
                     <button
                       type="button"
-                      class="btn dropdown-toggle"
-                      style="color: white"
+                      class="btn btn-dropdown-css dropdown-toggle"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
@@ -97,8 +167,7 @@
                   <div class="btn-group">
                     <button
                       type="button"
-                      class="btn dropdown-toggle"
-                      style="color: white"
+                      class="btn btn-dropdown-css dropdown-toggle"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
@@ -138,8 +207,7 @@
                   <div class="btn-group">
                     <button
                       type="button"
-                      class="btn dropdown-toggle"
-                      style="color: white"
+                      class="btn btn-dropdown-css dropdown-toggle"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >

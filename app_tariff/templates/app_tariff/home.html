@@ -109,8 +109,8 @@
       datasets: [{
         label: "關稅報導量",
         data: categories.map(cat => cat.count),
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
+        borderColor: 'rgba(38, 2, 36, 1)',         // 折線圖
+        backgroundColor: 'rgba(54, 89, 89, 0.2)',  // 折線區域背景
         borderWidth: 1
       }]
     };
@@ -139,7 +139,7 @@
       fontFamily: 'Arial',
       color: 'random-dark',
       rotateRatio: 0.5,
-      backgroundColor: '#f9f9f9',
+      backgroundColor: '#F2F2F0',
       click: function(item) {
         if (item) {
           window.location.href = `#${item[0]}`;
@@ -159,19 +159,19 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [
+      datasets: [ 
         {
           label: '關稅新聞篇數',
           data: articleCounts,
-          backgroundColor: 'rgba(255, 159, 64, 0.6)',
+          backgroundColor: 'rgba(54, 89, 89, 0.6)',
           yAxisID: 'y-axis-1',
         },
         {
           label: '關鍵字總提及次數',
           data: keywordMentions,
           type: 'line',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(166, 82, 51, 1)',         // 折線圖
+          backgroundColor: 'rgba(242, 226, 206, 0.4)',  // 折線區域背景
           yAxisID: 'y-axis-2',
         }
       ]
@@ -246,7 +246,7 @@ function call_ajax() {
         // 顯示篩選後的資料
         const num_articles = received["num_articles"];
         $("#num_articles").empty();
-        $("#num_articles").append("<h2 style='color:red'>總篇數(Top 30):"+num_articles+"</h2>");
+        $("#num_articles").append("<h2 style='color:#A65233'>總篇數(Top 30):"+num_articles+"</h2>");
         
         // 顯示新聞標題與連結
         const newslinks = received["newslinks"];
@@ -279,7 +279,7 @@ function call_ajax() {
         const same_paragraph = received["same_paragraph"];
         const num_paragraphs = received["num_paragraphs"];
         $("#same_paragraph").empty();
-        $("#same_paragraph").append("<h2 style='color:red'>總段落數(Top 30):"+num_paragraphs+"</h2>");
+        $("#same_paragraph").append("<h2 style='color:#A65233'>總段落數(Top 30):"+num_paragraphs+"</h2>");
         for (let i = 0; i < same_paragraph.length; i++) {
           const msg = "<li class='list-group-item py-2 border-bottom'>" + same_paragraph[i] + "</li>";
           $("#same_paragraph").append(msg);
