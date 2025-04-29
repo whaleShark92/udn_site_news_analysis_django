@@ -330,7 +330,7 @@ def get_same_para(queryset, user_keywords, cond, k=30):
 # (1) cate_occurence={}  被多少篇新聞報導 How many pieces of news contain the keywords.
 # (2) cate_freq={}       被提到多少次? How many times are the keywords mentioned
 
-news_categories = ['政治', '科技', '運動', '證卷', '產經', '娛樂', '生活', '國際', '社會', '文化', '兩岸', '全部']
+news_categories = ['全部','全球', '兩岸', '社會', '地方', '生活'] 
 
 def count_keyword(queryset, query_keywords):
 
