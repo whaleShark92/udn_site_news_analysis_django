@@ -41,5 +41,7 @@ urlpatterns = [
     path('topperson_db/', include('app_top_person_db.urls')),    
     # admin 後台資料庫管理
     path('admin/', admin.site.urls),
+    # user keyword sentiment 
+    path('userkeyword_report/', include('app_user_keyword_llm_report.urls')),
 
 ]

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'app_presidents',
     'app_user_keyword_db',
     'app_top_person_db',
+    'app_user_keyword_llm_report',
     
 ]
 
