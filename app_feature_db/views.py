@@ -68,15 +68,32 @@ def calculate_feature(request):
     # 🔥 關鍵修正：tuple 轉 list 才能被 JsonResponse 序列化
     top_keywords = [[k, v] for k, v in all_keywords.most_common(10)]
 
+    # ✅ 時間區間每日新聞數（折線圖資料）
+    from datetime import timedelta
+
+    latest_date = queryset.aggregate(last=Max('date'))['last'] or datetime.today().date()
+    start_date = datetime(2025, 1, 1).date()
+    end_date = latest_date
+
+    # 初始化日期對應的報導數字典
+    date_counts = {start_date + timedelta(days=i): 0 for i in range((end_date - start_date).days + 1)}
+
+    # 統計每日新聞數量
+    for news in queryset:
+        if news.date in date_counts:
+            date_counts[news.date] += 1
+
+    # 轉換成前端用的格式
+    report_trend = [{'x': d.strftime('%Y-%m-%d'), 'y': c} for d, c in date_counts.items()]
+
     # ✅ 寫入 Feature 表
     report_count = queryset.count()
     avg_sentiment = queryset.aggregate(avg=Avg('sentiment'))['avg'] or 0
-    latest_date = queryset.aggregate(last=Max('date'))['last'] or datetime.today().date()
-
+    
     Feature.objects.update_or_create(
     country_name=country,
     defaults={
-        'report_count': report_count,
+        'report_trend_json': json.dumps(report_trend, ensure_ascii=False),
         'latest_report_date': latest_date,
         'top_keywords_json': json.dumps(top_keywords, ensure_ascii=False),
         'sentiment_distribution_json': json.dumps(sentiment_distribution, ensure_ascii=False)
@@ -86,5 +103,7 @@ def calculate_feature(request):
     # ✅ 回傳給前端（注意 labels 是中文）
     return JsonResponse({
         'sentiment_distribution': sentiment_distribution,
-        'top_keywords': top_keywords
+        'top_keywords': top_keywords,
+        'report_trend': report_trend
+
     })

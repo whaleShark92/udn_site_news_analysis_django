@@ -33,10 +33,17 @@
       <canvas id="keywordBarChart"></canvas>
     </div>
   </div>
+  <div class="col-md-6">
+    <h5>報導折線圖</h5>
+    <canvas id="drawLineChart"></canvas>
+  </div>
 </div>
 
 <!-- ✅ 載入 Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
 
 <script>
   const form = document.getElementById('countryForm');
@@ -68,9 +75,14 @@
           alert('後端資料不完整，請稍後再試。');
           return;
         }
-
+      
         drawSentimentChart(data.sentiment_distribution);
         drawKeywordChart(data.top_keywords);
+      
+        // ✅ 補上這段來畫折線圖
+        if (data.report_trend) {
+            drawLineChart(data.report_trend);
+        }
       })
     .catch(err => {
       alert('載入資料失敗：' + err.message);
@@ -102,13 +114,13 @@
     if (keywordChart) {
       keywordChart.destroy();
     }
-
+  
     if (!pairs || pairs.length === 0) {
       ctx.font = '16px Arial';
       ctx.fillText('暫無熱門關鍵字資料', 10, 50);
       return;
     }
-
+  
     keywordChart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -123,9 +135,7 @@
         indexAxis: 'y',
         responsive: true,
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: function(context) {
@@ -137,14 +147,46 @@
         scales: {
           x: {
             beginAtZero: true,
-            title: {
-              display: true,
-              text: '出現次數'
-            }
+            title: { display: true, text: '出現次數' }
+          }
+        }
+      }
+    });
+  } // ✅ 正確結尾
+  
+  // ✅ 正確移出 drawLineChart 函式
+  function drawLineChart(data) {
+    const ctx = document.getElementById('drawLineChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: '每日報導數',
+          data: data,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: true
+        }]
+      },
+      options: {
+        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              tooltipFormat: 'yyyy-MM-dd'
+            },
+            title: { display: true, text: '日期' }
+          },
+          y: {
+            title: { display: true, text: '報導數' },
+            beginAtZero: true
           }
         }
       }
     });
   }
+  
 </script>
 {% endblock %}
