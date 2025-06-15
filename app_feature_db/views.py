@@ -74,13 +74,13 @@ def calculate_feature(request):
     latest_date = queryset.aggregate(last=Max('date'))['last'] or datetime.today().date()
 
     Feature.objects.update_or_create(
-        country_name=country,
-        defaults={
-            'report_count': report_count,
-            'avg_sentiment': avg_sentiment,
-            'latest_report_date': latest_date,
-            'top_keywords_json': json.dumps(top_keywords, ensure_ascii=False)
-        }
+    country_name=country,
+    defaults={
+        'report_count': report_count,
+        'latest_report_date': latest_date,
+        'top_keywords_json': json.dumps(top_keywords, ensure_ascii=False),
+        'sentiment_distribution_json': json.dumps(sentiment_distribution, ensure_ascii=False)
+    }
     )
 
     # ✅ 回傳給前端（注意 labels 是中文）
