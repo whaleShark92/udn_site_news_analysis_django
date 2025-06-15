@@ -15,7 +15,6 @@ the format of data:
   }
 '''
 
-
 def home(request):
     #return render(request, 'app_top_person_db/home.html')
     return render(request, 'app_top_person_db/home.html') # home.html是相同的
@@ -84,18 +83,19 @@ from django.db.models import Q, Max, F
 def calculate_top_person(request):
     
     # Get the latest date in the database
-    latest_date = NewsData.objects.aggregate(max_date=Max('date'))['max_date']
+    # latest_date = NewsData.objects.aggregate(max_date=Max('date'))['max_date']
     
     # Calculate start date
-    start_date = latest_date - timedelta(weeks=4)  # 4 weeks ago
+    # start_date = latest_date - timedelta(weeks=4)  # 4 weeks ago
     
     top_cate_ner_words={}
     words_all=[]
     for category in news_categories:
         
         # Use Django's ORM to get entities for the given category
-        entities_list = list(NewsData.objects.filter(category=category).filter(date__gte=start_date, date__lte=latest_date).values_list('entities', flat=True))
-                
+        # entities_list = list(NewsData.objects.filter(category=category).filter(date__gte=start_date, date__lte=latest_date).values_list('entities', flat=True))
+        entities_list = list(NewsData.objects.filter(category=category).values_list('entities', flat=True))
+
         # Process the retrieved entities
         words_group = []
         for entities in entities_list:
@@ -141,7 +141,7 @@ def calculate_top_person(request):
 
 
 allowedNE=['PERSON']
-news_categories=['全球', '兩岸', '社會', '地方', '生活'] 
+news_categories=['全球', '兩岸', '社會', '地方', '生活','要聞','運動','產經','股市','文教','評論','Oops'] 
 def ne_word_frequency( a_news_ne ):
     filtered_words =[]
     for ner,word in a_news_ne:

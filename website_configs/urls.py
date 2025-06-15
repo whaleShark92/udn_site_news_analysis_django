@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
+    path('', include('app_home.urls')),
     # path('admin/', admin.site.urls),
     path('topword/', include('app_top_keyword.urls')),
     # app top persons
@@ -43,5 +44,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # user keyword sentiment 
     path('userkeyword_report/', include('app_user_keyword_llm_report.urls')),
+    # full text search and associated keyword display using db
+    path('feature_db/', include('app_feature_db.urls')),    
 
 ]

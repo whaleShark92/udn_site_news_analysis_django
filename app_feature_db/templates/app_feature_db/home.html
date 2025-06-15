@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}各國情緒分析 | 輿情平台{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="text-center mt-4" style="color:#260224;">🌍 各國新聞情緒分析</h2>
+  <form id="countryForm" class="text-center mb-4">
+    <label for="country">請選擇國家：</label>
+    <select id="country" name="country">
+      <option value="美國">美國</option>
+      <option value="中國">中國</option>
+      <option value="俄羅斯">俄羅斯</option>
+      <option value="烏克蘭">烏克蘭</option>
+      <option value="台灣">台灣</option>
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">查詢</button>
+  </form>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h5>情緒分布圖</h5>
+      <canvas id="sentimentPieChart"></canvas>
+    </div>
+    <div class="col-md-6">
+      <h5>前十大熱門關鍵字</h5>
+      <canvas id="keywordBarChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 載入 Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const form = document.getElementById('countryForm');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const country = document.getElementById('country').value;
+
+    fetch('/feature_db/calculate_feature/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'country=' + encodeURIComponent(country)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("伺服器錯誤，HTTP 狀態碼：" + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+        console.log('後端回傳:', data);
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        if (!data.sentiment_distribution || !data.top_keywords) {
+          alert('後端資料不完整，請稍後再試。');
+          return;
+        }
+
+        drawSentimentChart(data.sentiment_distribution);
+        drawKeywordChart(data.top_keywords);
+      })
+    .catch(err => {
+      alert('載入資料失敗：' + err.message);
+    });
+  });
+
+  let sentimentChart = null;
+  let keywordChart = null;
+
+  function drawSentimentChart(data) {
+    const ctx = document.getElementById('sentimentPieChart').getContext('2d');
+    if (sentimentChart) sentimentChart.destroy();
+  
+    sentimentChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['正向', '中立', '負向'],
+        datasets: [{
+          data: [data['正向'], data['中立'], data['負向']],
+          backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+        }]
+      }
+    });
+  }
+  
+
+  function drawKeywordChart(pairs) {
+    const ctx = document.getElementById('keywordBarChart').getContext('2d');
+    if (keywordChart) {
+      keywordChart.destroy();
+    }
+
+    if (!pairs || pairs.length === 0) {
+      ctx.font = '16px Arial';
+      ctx.fillText('暫無熱門關鍵字資料', 10, 50);
+      return;
+    }
+
+    keywordChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: pairs.map(p => p[0]),
+        datasets: [{
+          label: '出現次數',
+          data: pairs.map(p => p[1]),
+          backgroundColor: '#365959'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.label}: ${context.raw} 次`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: '出現次數'
+            }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',  # 跨域資源共享
+    'app_home',
     'app_top_keyword',
     'app_top_person',
     'app_user_keyword',
@@ -37,7 +38,7 @@ INSTALLED_APPS = [
     'app_user_keyword_db',
     'app_top_person_db',
     'app_user_keyword_llm_report',
-    
+    'app_feature_db',
 ]
 
 MIDDLEWARE = [

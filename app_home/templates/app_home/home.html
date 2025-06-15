@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}首頁 | 輿情分析平台{% endblock %}
+
+{% block content %}
+<div class="col-12">
+  <div class="custom-container">
+    <h2 class="text-center mb-4" style="color: #260224">UDN 新聞輿情分析平台</h2>
+    <p>
+      本專案為以 Django 架構打造的新聞分析網站，擷取聯合新聞網五大類別新聞（全球、兩岸、社會、地方、生活），
+      進行斷詞分析、關鍵詞統計、熱門人物萃取、情緒分析、關鍵詞關聯探勘與自動生成分析報告等，結合資料科學與語言模型技術，
+      提供互動式的可視化網頁分析介面。
+    </p>
+    <p>🔗 GitHub Repo：<a href="https://github.com/whaleShark92/udn_site_news_analysis_django.git" target="_blank">udn_site_news_analysis_django</a></p>
+
+    <hr />
+
+    <h4 style="color: #365959">📌 分析功能總覽</h4>
+    <ul>
+      <li><strong>熱門關鍵字分析：</strong>統計各類新聞中的高頻詞彙。</li>
+      <li><strong>熱門人物辨識：</strong>透過 CKIP NER 技術擷取重要人物。</li>
+      <li><strong>關鍵詞熱門度分析：</strong>查詢任意關鍵詞在各類新聞中的篇數與頻率。</li>
+      <li><strong>關鍵詞關聯分析：</strong>觀察兩組關鍵詞同現的新聞與段落。</li>
+      <li><strong>關稅主題分析：</strong>提供關稅新聞篇數與詞頻之時間趨勢圖。</li>
+      <li><strong>情緒分析：</strong>針對自訂關鍵詞新聞內容進行情感極性分類。</li>
+      <li><strong>國家領袖聲量觀測：</strong>觀察川普、習近平、普亭等人物聲量變化。</li>
+      <li><strong>語言模型報告生成：</strong>呼叫 Gemini / OpenAI 生成摘要報告。</li>
+    </ul>
+
+    <hr />
+
+    <h4 style="color: #365959">🔧 技術架構</h4>
+    <ul>
+      <li>Django 架構 + Bootstrap 前端設計</li>
+      <li>資料儲存格式：CSV 檔案 / Django ORM</li>
+      <li>爬蟲技術：Selenium + BeautifulSoup</li>
+      <li>可視化：Chart.js / WordCloud.js</li>
+      <li>語言模型應用：OpenAI、Gemini、Ollama</li>
+    </ul>
+
+    <hr />
+
+    <h4 style="color: #365959">📂 功能模組與資料路徑簡介</h4>
+    <ul>
+      <li>app_top_keyword/：熱門關鍵詞分析</li>
+      <li>app_top_person/：實體人物辨識與排行</li>
+      <li>app_user_keyword/：自訂關鍵詞趨勢</li>
+      <li>app_user_keyword_association/：全文關聯分析</li>
+      <li>app_user_keyword_sentiment/：新聞情緒分類</li>
+      <li>app_tariff/：關稅新聞分析</li>
+      <li>app_presidents/：國際領袖聲量追蹤</li>
+      <li>app_user_keyword_llm_report/：語言模型分析報告</li>
+    </ul>
+
+    <p class="text-end"><em>設計者：C110118131 吳家妤</em></p>
+  </div>
+</div>
+{% endblock %}
