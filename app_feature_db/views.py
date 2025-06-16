@@ -1,32 +1,40 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-from django.db.models import Avg, Count, Max, Q
+from datetime import datetime, timedelta, date
+from django.utils import timezone
+from django.db.models import Max, Q
 from app_user_keyword_db.models import NewsData
 from app_feature_db.models import Feature
 import json
 from collections import Counter
 import ast
-from django.utils import timezone
-from datetime import timedelta
 
 
 def home(request):
-    week_options = ['1', '2', '3', '4', '6', '8', '12']
-    keynum_options = ['5', '10', '15', '20']
+    week_options = ['1', '2', '4', '8', '16', '24']
+    keynum_options = ['5', '10', '15', '20','25']
+    continents = {
+        '亞洲': [
+            '台灣','中國', '日本', '韓國',  '新加坡', '泰國',
+            '越南', '馬來西亞', '印尼', '菲律賓', '印度', '巴基斯坦'
+        ],
+        '歐洲': [
+            '英國', '法國', '德國', '義大利', '西班牙', '荷蘭',
+            '瑞士', '瑞典', '挪威', '芬蘭', '波蘭', '烏克蘭', '俄羅斯'
+        ],
+        '北美洲': ['美國', '加拿大', '墨西哥'],
+        '南美洲': ['巴西', '阿根廷', '智利', '哥倫比亞', '秘魯'],
+        '非洲': ['南非', '奈及利亞', '埃及', '肯亞', '迦納'],
+        '大洋洲': ['澳洲', '紐西蘭'],
+        '中東': ['土耳其', '以色列', '沙烏地阿拉伯', '伊朗', '阿拉伯聯合大公國', '卡達']
+    }
     return render(request, 'app_feature_db/home.html', {
         'week_options': week_options,
-        'keynum_options': keynum_options
+        'keynum_options': keynum_options,
+        'continents': continents
     })
 
-
-# 假設國家列表，你可自行替換
-# country_list = ['中國', '美國', '日本', '韓國', '俄羅斯', '台灣', '英國', '法國', '德國', '加拿大']
-# 允許的國家NER類別
-allowedNE = ['GPE']
-
-from datetime import date
 
 @csrf_exempt
 def calculate_feature(request):
@@ -37,50 +45,53 @@ def calculate_feature(request):
     weeks = int(request.POST.get('weeks', 2))
     keynum = int(request.POST.get('keynum', 20))
 
-    if not country:
-        return JsonResponse({'error': '缺少 country 參數'}, status=400)
+    allowed_countries = [
+        # 亞洲
+        '中國', '日本', '韓國', '台灣', '新加坡', '泰國', '越南', '馬來西亞', '印尼', '菲律賓', '印度', '巴基斯坦',
+        
+        # 歐洲
+        '英國', '法國', '德國', '義大利', '西班牙', '荷蘭', '瑞士', '瑞典', '挪威', '芬蘭', '波蘭', '烏克蘭', '俄羅斯',
+        
+        # 北美洲
+        '美國', '加拿大', '墨西哥',
+        
+        # 南美洲
+        '巴西', '阿根廷', '智利', '哥倫比亞', '秘魯',
 
-    # 嘗試從 Feature 拿資料
-    latest_record = Feature.objects.filter(country_name=country).order_by('-latest_report_date').first()
+        # 非洲
+        '南非', '奈及利亞', '埃及', '肯亞', '迦納',
 
-    # 判斷 Feature 是否有資料，且資料是否夠新或最舊是2025-01-01或更早
-    if latest_record:
-        # 如果最舊日期是2025-01-01或更早，直接用快取資料，不查 NewsData
-        if latest_record.latest_report_date and latest_record.latest_report_date <= date(2025, 1, 1):
-            sentiment_distribution = json.loads(latest_record.sentiment_distribution_json or '{}')
-            top_keywords = json.loads(latest_record.top_keywords_json or '[]')
-            report_trend = json.loads(latest_record.report_trend_json or '[]')
-            return JsonResponse({
-                'sentiment_distribution': sentiment_distribution,
-                'top_keywords': top_keywords,
-                'report_trend': report_trend,
-                'message': f'資料日期為 {latest_record.latest_report_date}，不重新查詢 NewsData。',
-            })
+        # 大洋洲
+        '澳洲', '紐西蘭',
 
-        # 或者資料夠新，也直接用快取資料
-        if latest_record.latest_report_date >= timezone.now().date() - timedelta(weeks=weeks):
-            sentiment_distribution = json.loads(latest_record.sentiment_distribution_json or '{}')
-            top_keywords = json.loads(latest_record.top_keywords_json or '[]')
-            report_trend = json.loads(latest_record.report_trend_json or '[]')
-            return JsonResponse({
-                'sentiment_distribution': sentiment_distribution,
-                'top_keywords': top_keywords,
-                'report_trend': report_trend,
-                'message': f'使用快取資料，日期為 {latest_record.latest_report_date}',
-            })
+        # 中東
+        '土耳其', '以色列', '沙烏地阿拉伯', '伊朗', '阿拉伯聯合大公國', '卡達'
+    ]
 
-    # 如果上述條件都不符合，繼續查 NewsData，做計算...
-    # (此處省略原本查詢 NewsData 與計算邏輯)
-    ...
+    if not country or country not in allowed_countries:
+        return JsonResponse({'error': f'缺少或不合法的 country 參數（{country}）'}, status=400)
 
 
-    # 如果 Feature 沒有資料或資料過舊，去 NewsData 查詢，做計算
+    # 先檢查 Feature 表中是否已有該國家的「最舊」紀錄（日期升冪）
+    oldest_record = Feature.objects.filter(country_name=country).order_by('latest_report_date').first()
+    if oldest_record and oldest_record.latest_report_date and oldest_record.latest_report_date <= date(2025, 1, 1):
+        sentiment_distribution = json.loads(oldest_record.sentiment_distribution_json or '{}')
+        top_keywords = json.loads(oldest_record.top_keywords_json or '[]')
+        report_trend = json.loads(oldest_record.report_trend_json or '[]')
+        return JsonResponse({
+            'sentiment_distribution': sentiment_distribution,
+            'top_keywords': top_keywords,
+            'report_trend': report_trend,
+            'message': f'最舊資料日期為 {oldest_record.latest_report_date}，直接使用快取資料。',
+        })
+
+    # 若不是最舊資料則從 NewsData 查詢
     latest_date = NewsData.objects.filter(
         Q(title__icontains=country) | Q(content__icontains=country)
     ).aggregate(last=Max('date'))['last']
 
     if not latest_date:
-        return JsonResponse({'error': f'找不到關於 {country} 的新聞資料'}, status=404)
+        return JsonResponse({'error': f'沒有 {country} 的資料'}, status=404)
 
     start_date = latest_date - timedelta(weeks=weeks)
 
@@ -90,6 +101,7 @@ def calculate_feature(request):
         date__lte=latest_date
     )
 
+    # 情緒統計
     sentiment_counts = {'正向': 0, '中立': 0, '負向': 0}
     for news in queryset:
         score = news.sentiment
@@ -106,8 +118,8 @@ def calculate_feature(request):
     else:
         sentiment_distribution = {k: round(v / total * 100, 1) for k, v in sentiment_counts.items()}
 
+    # 關鍵字統計
     all_keywords = Counter()
-    import ast
     for news in queryset:
         try:
             if news.top_key_freq:
@@ -119,6 +131,7 @@ def calculate_feature(request):
 
     top_keywords = [[k, v] for k, v in all_keywords.most_common(keynum)]
 
+    # 每日新聞量趨勢
     date_counts = {}
     days = (latest_date - start_date).days + 1
     for i in range(days):
@@ -129,8 +142,8 @@ def calculate_feature(request):
             date_counts[news.date] += 1
     report_trend = [{'x': d.strftime('%Y-%m-%d'), 'y': c} for d, c in date_counts.items()]
 
-    # 把計算結果存回 Feature，若已有則更新，沒有就建立
-    feature_obj, created = Feature.objects.update_or_create(
+    # 存入 Feature 表
+    Feature.objects.update_or_create(
         country_name=country,
         defaults={
             'latest_report_date': latest_date,
@@ -144,5 +157,5 @@ def calculate_feature(request):
         'sentiment_distribution': sentiment_distribution,
         'top_keywords': top_keywords,
         'report_trend': report_trend,
-        'message': f'已計算最新資料並更新 Feature 表。',
+        'message': f'已計算並儲存 {country} 的最新資料（{latest_date}）',
     })
