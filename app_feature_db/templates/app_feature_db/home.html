@@ -3,41 +3,85 @@
 {% block title %}各國情緒分析 | 輿情平台{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h2 class="text-center mt-4" style="color:#260224;">🌍 各國新聞情緒分析</h2>
-  <form id="countryForm" class="text-center mb-4">
-    <label for="country">請選擇國家：</label>
-    <select id="country" name="country">
-      <option value="美國">美國</option>
-      <option value="中國">中國</option>
-      <option value="俄羅斯">俄羅斯</option>
-      <option value="烏克蘭">烏克蘭</option>
-      <option value="台灣">台灣</option>
-      <option value="日本">日本</option>
-      <option value="韓國">韓國</option>
-      <option value="英國">英國</option>
-      <option value="法國">法國</option>
-      <option value="德國">德國</option>
-      <option value="加拿大">加拿大</option>
-    </select>
-    <button type="submit" class="btn btn-primary btn-sm">查詢</button>
-  </form>
+<div class="col-lg-12">
+    <h1>🌍 各國新聞情緒分析</h1>
+    <form id="countryForm">
+      <h5 for="country">請選擇國家：
+      <select id="country" name="country" class="mx-2">
+        <option value="美國">美國</option>
+        <option value="中國">中國</option>
+        <option value="俄羅斯">俄羅斯</option>
+        <option value="烏克蘭">烏克蘭</option>
+        <option value="台灣">台灣</option>
+        <option value="日本">日本</option>
+        <option value="韓國">韓國</option>
+        <option value="英國">英國</option>
+        <option value="法國">法國</option>
+        <option value="德國">德國</option>
+        <option value="加拿大">加拿大</option>
+      </select>
+      <button type="submit" style="weight: 200px;" class="btn btn-primary">查詢</button>
+    </h5>
+    </form>
+</div>  
 
-  <div class="row">
-    <div class="col-md-6">
-      <h5>情緒分布圖</h5>
-      <canvas id="sentimentPieChart"></canvas>
+<div class="col-lg-6 col-md-12 mb-2">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">報導情緒分析</h3>
+      </div> 
+      <div class="card-body">
+        <canvas id="sentimentPieChart"></canvas>
+      </div>
     </div>
-    <div class="col-md-6">
-      <h5>前十大熱門關鍵字</h5>
-      <canvas id="keywordBarChart"></canvas>
-    </div>
-  </div>
-  <div class="col-md-6">
-    <h5>報導折線圖</h5>
-    <canvas id="drawLineChart"></canvas>
-  </div>
 </div>
+
+<div class="col-lg-6 col-md-12 mb-2">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">前十大熱門關鍵字</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="keywordBarChart"></canvas>
+      </div>
+    </div>
+</div>
+
+<div class="col-lg-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">報導折線圖</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="drawLineChart" height="200"></canvas>
+      </div>
+    </div>
+</div>
+<style>
+    /* ✅ 卡片內 canvas 統一樣式 */
+    .card-body canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      margin: 0 auto !important;
+    }
+  
+    /* ✅ 各圖表高度設定 */
+    #sentimentPieChart {
+      max-height: 300px !important;
+    }
+  
+    #keywordBarChart {
+      max-height: 400px !important;
+    }
+  
+    #drawLineChart {
+      max-height: 400px !important;
+    }
+  </style>
+  
+  
+
 
 <!-- ✅ 載入 Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -46,6 +90,12 @@
 
 
 <script>
+    // 頁面載入時，預設呼叫台灣資料
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('country').value = '台灣';  // 預設選台灣
+        form.dispatchEvent(new Event('submit')); // 觸發 submit 事件呼叫後端
+  });
+  
   const form = document.getElementById('countryForm');
   form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -91,6 +141,7 @@
 
   let sentimentChart = null;
   let keywordChart = null;
+  let lineChart = null;
 
   function drawSentimentChart(data) {
     const ctx = document.getElementById('sentimentPieChart').getContext('2d');
@@ -102,7 +153,7 @@
         labels: ['正向', '中立', '負向'],
         datasets: [{
           data: [data['正向'], data['中立'], data['負向']],
-          backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+          backgroundColor: ['#365959', '#F2E2CE', '#A65233']
         }]
       }
     });
@@ -155,38 +206,46 @@
   } // ✅ 正確結尾
   
   // ✅ 正確移出 drawLineChart 函式
-  function drawLineChart(data) {
-    const ctx = document.getElementById('drawLineChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        datasets: [{
-          label: '每日報導數',
-          data: data,
-          borderColor: 'rgba(54, 162, 235, 1)',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          fill: true
-        }]
-      },
-      options: {
-        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'day',
-              tooltipFormat: 'yyyy-MM-dd'
+  // 改為用 requestAnimationFrame 確保渲染時機
+function drawLineChart(data) {
+    requestAnimationFrame(() => {
+      const ctx = document.getElementById('drawLineChart').getContext('2d');
+      if (lineChart) lineChart.destroy();
+  
+      lineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: '每日報導數',
+            data: data,
+            borderColor: '#A65233',
+            backgroundColor: '#F2F2F0',
+            fill: true
+          }]
+        },
+        options: {
+          parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day',
+                tooltipFormat: 'yyyy-MM-dd'
+              },
+              title: { display: true, text: '日期' }
             },
-            title: { display: true, text: '日期' }
-          },
-          y: {
-            title: { display: true, text: '報導數' },
-            beginAtZero: true
+            y: {
+              title: { display: true, text: '報導數' },
+              beginAtZero: true
+            }
           }
         }
-      }
+      });
     });
   }
+  
   
 </script>
 {% endblock %}
