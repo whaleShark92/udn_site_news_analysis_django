@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}各國情緒分析 | 輿情平台{% endblock %}
+{% block title %} 各國的關注程度與情緒導向 {% endblock %}
 
 {% block content %}
 <div class="col-lg-12 mb-2">
-    <h1> 各國新聞情緒分析</h1>
-    <p>這個網頁將提供最新的各國新聞情緒分析結果</p>
+    <h1> 各國的關注程度與情緒導向</h1>
+    <p>2025年上半年聯合新聞網對各國的關注程度與情緒導向</p>
   
     <div class="card">
       <div class="card-header">
@@ -106,7 +106,7 @@
   </div>  
   
   
-<div class="col-lg-6 col-md-12 mb-2">
+<div class="col-lg-5 col-md-12 mb-2">
     <div class="card">
       <div class="card-header">
         <h3 class="h6 text-uppercase mb-0">報導情緒分析</h3>
@@ -117,7 +117,7 @@
     </div>
 </div>
 
-<div class="col-lg-6 col-md-12 mb-2">
+<div class="col-lg-7 col-md-12 mb-2">
     <div class="card">
       <div class="card-header">
         <h3 class="h6 text-uppercase mb-0">前十大熱門關鍵字</h3>
@@ -150,11 +150,11 @@
   
     /* ✅ 各圖表高度設定 */
     #sentimentPieChart {
-      max-height: 300px !important;
+      max-height: 400px !important;
     }
   
     #keywordBarChart {
-      max-height: 400px !important;
+      height: 400px !important;
     }
   
     #drawLineChart {
@@ -269,7 +269,11 @@
       }
     })
     .catch(err => {
-      alert('載入資料失敗：' + err.message);
+      if (err.message.includes('404')) {
+        alert(`期間內尚未有關於「${country}」的資料`);
+      } else {
+        alert('載入資料失敗：' + err.message);
+      }
     });
   });
 

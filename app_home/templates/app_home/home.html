@@ -5,54 +5,152 @@
 {% block content %}
 <div class="col-12">
   <div class="custom-container">
-    <h2 class="text-center mb-4" style="color: #260224">UDN 新聞輿情分析平台</h2>
-    <p>
-      本專案為以 Django 架構打造的新聞分析網站，擷取聯合新聞網五大類別新聞（全球、兩岸、社會、地方、生活），
-      進行斷詞分析、關鍵詞統計、熱門人物萃取、情緒分析、關鍵詞關聯探勘與自動生成分析報告等，結合資料科學與語言模型技術，
-      提供互動式的可視化網頁分析介面。
+    <h1 class="text-center mb-4">🌐 UDN 新聞輿情分析平台</h1>
+
+    <p class="mb-3" style="color: #260224;">
+      本專案為以 Django 架構打造的新聞分析網站，主要針對 <strong>2025 年上半年</strong>的聯合新聞網（UDN）資料進行蒐集與分析。
+      透過自動化爬蟲擷取每日新聞資料，結合自然語言處理與資料科學技術，進行一系列深入的文本分析，
+      包括：<strong>斷詞處理</strong>、<strong>關鍵詞統計</strong>、<strong>熱門人物萃取</strong>、<strong>情緒分類</strong>、
+      <strong>關鍵詞關聯探勘</strong>，以及整合語言模型實現的 <strong>自動摘要報告生成</strong>。
     </p>
-    <p>🔗 GitHub Repo：<a href="https://github.com/whaleShark92/udn_site_news_analysis_django.git" target="_blank">udn_site_news_analysis_django</a></p>
+    <p class="mb-3" style="color: #260224;">
+      除了提供 <strong>即時互動式的可視化圖表</strong>，本平台亦設計多個模組功能，供使用者查詢特定詞彙趨勢、觀察人物聲量變化，
+      並針對 <strong>特定主題（如：關稅）</strong> 進行情境式分析。此外，新增的「<strong>各國關注度與情緒導向分析</strong>」功能，
+      能呈現不同國家在報導中的被關注程度與輿情傾向，協助觀察媒體對全球事件的態度與情緒。
+    </p>
+    <p class="mb-3" style="color: #260224;">
+      本系統整合多項現代技術，包括 Django 框架、Bootstrap 前端、Selenium 自動化爬蟲、CKIP NER 實體辨識、
+      Chart.js 與 WordCloud.js 視覺化技術，以及 Gemini / OpenAI 語言模型 API 應用，
+      建構出一個功能豐富、操作直覺、具可擴展性的輿情分析平台。
+    </p>
 
-    <hr />
-
-    <h4 style="color: #365959">📌 分析功能總覽</h4>
-    <ul>
-      <li><strong>熱門關鍵字分析：</strong>統計各類新聞中的高頻詞彙。</li>
-      <li><strong>熱門人物辨識：</strong>透過 CKIP NER 技術擷取重要人物。</li>
-      <li><strong>關鍵詞熱門度分析：</strong>查詢任意關鍵詞在各類新聞中的篇數與頻率。</li>
-      <li><strong>關鍵詞關聯分析：</strong>觀察兩組關鍵詞同現的新聞與段落。</li>
-      <li><strong>關稅主題分析：</strong>提供關稅新聞篇數與詞頻之時間趨勢圖。</li>
-      <li><strong>情緒分析：</strong>針對自訂關鍵詞新聞內容進行情感極性分類。</li>
-      <li><strong>國家領袖聲量觀測：</strong>觀察川普、習近平、普亭等人物聲量變化。</li>
-      <li><strong>語言模型報告生成：</strong>呼叫 Gemini / OpenAI 生成摘要報告。</li>
-    </ul>
-
-    <hr />
-
-    <h4 style="color: #365959">🔧 技術架構</h4>
-    <ul>
-      <li>Django 架構 + Bootstrap 前端設計</li>
-      <li>資料儲存格式：CSV 檔案 / Django ORM</li>
-      <li>爬蟲技術：Selenium + BeautifulSoup</li>
-      <li>可視化：Chart.js / WordCloud.js</li>
-      <li>語言模型應用：OpenAI、Gemini、Ollama</li>
-    </ul>
-
-    <hr />
-
-    <h4 style="color: #365959">📂 功能模組與資料路徑簡介</h4>
-    <ul>
-      <li>app_top_keyword/：熱門關鍵詞分析</li>
-      <li>app_top_person/：實體人物辨識與排行</li>
-      <li>app_user_keyword/：自訂關鍵詞趨勢</li>
-      <li>app_user_keyword_association/：全文關聯分析</li>
-      <li>app_user_keyword_sentiment/：新聞情緒分類</li>
-      <li>app_tariff/：關稅新聞分析</li>
-      <li>app_presidents/：國際領袖聲量追蹤</li>
-      <li>app_user_keyword_llm_report/：語言模型分析報告</li>
-    </ul>
-
-    <p class="text-end"><em>設計者：C110118131 吳家妤</em></p>
+    <p style="color: #260224;">
+      🔗 GitHub Repo：
+      <a href="https://github.com/whaleShark92/udn_site_news_analysis_django.git" target="_blank" style="color: #A65233; text-decoration: underline;">
+        udn_site_news_analysis_django
+      </a>
+    </p>
   </div>
+
+  <div class="row">
+    <!-- 分析功能總覽 -->
+     <!-- 分析功能總覽 -->
+<div class="col-md-7">
+  <div class="card mb-4">
+    <div class="card-header">📌 分析功能總覽</div>
+    <div class="p-3">
+      <ul class="mb-0" style="list-style-type: disc; padding-left: 1.2rem;">
+        <li>
+          <a href="{% url 'app_top_keyword:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            熱門關鍵詞分析：統計各類新聞中的高頻詞彙。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_top_person:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            熱門人物辨識：透過 CKIP NER 技術擷取重要人物。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_user_keyword:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            關鍵詞熱門度分析：查詢任意關鍵詞在各類新聞中的篇數與頻率。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_user_keyword_association:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            關鍵詞關聯分析：觀察兩組關鍵詞同現的新聞與段落。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_tariff:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            關稅主題分析：提供關稅新聞篇數與詞頻之時間趨勢圖。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_user_keyword_sentiment:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            情緒分析：針對自訂關鍵詞新聞內容進行情感極性分類。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_presidents:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            國家領袖聲量觀測：觀察川普、習近平、普亭等人物聲量變化。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_user_keyword_llm_report:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            語言模型報告生成：呼叫 Gemini / OpenAI 生成摘要報告。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_feature_db:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            各國的關注程度與情緒導向：2025年上半年聯合新聞網對各國的關注程度與情緒導向。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_top_person_db:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            熱門人物排行(資料庫)：從資料庫即時查詢熱門人物排名。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_top_person_db:calculate_top_person' %}" class="d-block text-decoration-none" style="color: inherit;">
+            熱門人物立刻計算：管理者定時執行熱門人物計算任務。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_user_keyword_db:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            自訂全文檢索與關聯分析(db)：基於資料庫的全文關鍵詞關聯分析。
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'app_trump:home' %}" class="d-block text-decoration-none" style="color: inherit;">
+            川普聲量我最大：專門針對川普新聞聲量的觀測與分析。
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 功能模組與資料路徑簡介 -->
+<div class="col-md-5">
+  <div class="card mb-4">
+    <div class="card-header">📂 功能模組與資料路徑簡介</div>
+    <div class="p-3">
+      <ul class="mb-0" style="list-style-type: disc; padding-left: 1.2rem;">
+        <li><a href="{% url 'app_top_keyword:home' %}" class="text-decoration-none" style="color: inherit;">app_top_keyword/：熱門關鍵詞分析</a></li>
+        <li><a href="{% url 'app_top_person:home' %}" class="text-decoration-none" style="color: inherit;">app_top_person/：熱門人物排行分析</a></li>
+        <li><a href="{% url 'app_user_keyword:home' %}" class="text-decoration-none" style="color: inherit;">app_user_keyword/：自訂關鍵詞熱門度分析</a></li>
+        <li><a href="{% url 'app_user_keyword_association:home' %}" class="text-decoration-none" style="color: inherit;">app_user_keyword_association/：自訂全文檢索與關聯分析</a></li>
+        <li><a href="{% url 'app_user_keyword_sentiment:home' %}" class="text-decoration-none" style="color: inherit;">app_user_keyword_sentiment/：自訂關鍵詞情緒分析</a></li>
+        <li><a href="{% url 'app_tariff:home' %}" class="text-decoration-none" style="color: inherit;">app_tariff/：關稅新聞分析與報導</a></li>
+        <li><a href="{% url 'app_presidents:home' %}" class="text-decoration-none" style="color: inherit;">app_presidents/：國家領袖聲量追蹤</a></li>
+        <li><a href="{% url 'app_user_keyword_llm_report:home' %}" class="text-decoration-none" style="color: inherit;">app_user_keyword_llm_report/：自訂關鍵詞語言模型分析報告</a></li>
+        <li><a href="{% url 'app_feature_db:home' %}" class="text-decoration-none" style="color: inherit;">app_feature_db/：各國關注程度與情緒導向分析</a></li>
+        <li><a href="{% url 'app_top_person_db:home' %}" class="text-decoration-none" style="color: inherit;">app_top_person_db/：熱門人物排行（資料庫查詢）</a></li>
+        <li><a href="{% url 'app_top_person_db:calculate_top_person' %}" class="text-decoration-none" style="color: inherit;">app_top_person_db:calculate_top_person：熱門人物立刻計算（管理者定時執行）</a></li>
+        <li><a href="{% url 'app_user_keyword_db:home' %}" class="text-decoration-none" style="color: inherit;">app_user_keyword_db/：自訂全文檢索與關聯分析（資料庫版）</a></li>
+        <li><a href="{% url 'app_trump:home' %}" class="text-decoration-none" style="color: inherit;">app_trump/：川普聲量專屬分析</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- 技術架構 -->
+  <div class="card mb-4">
+    <div class="card-header">🔧 技術架構</div>
+    <div class="p-3">
+      <ul class="mb-0" style="list-style-type: disc; padding-left: 1.2rem;">
+        <li>Django 架構 + Bootstrap 前端設計</li>
+        <li>資料儲存格式：CSV 檔案 / Django ORM</li>
+        <li>爬蟲技術：Selenium + BeautifulSoup</li>
+        <li>可視化：Chart.js / WordCloud.js</li>
+        <li>語言模型應用：OpenAI、Gemini、Ollama</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="text-end" style="color: #A65233;"><em>設計者：C110118131 吳家妤</em></p>
 </div>
 {% endblock %}

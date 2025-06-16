@@ -69,7 +69,7 @@ def calculate_feature(request):
     ]
 
     if not country or country not in allowed_countries:
-        return JsonResponse({'error': f'缺少或不合法的 country 參數（{country}）'}, status=400)
+        return JsonResponse({'error': f'期間內尚未有關於 「{country}」 的國家'})
 
 
     # 先檢查 Feature 表中是否已有該國家的「最舊」紀錄（日期升冪）
