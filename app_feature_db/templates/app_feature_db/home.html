@@ -3,27 +3,102 @@
 {% block title %}各國情緒分析 | 輿情平台{% endblock %}
 
 {% block content %}
-<div class="col-lg-12">
-    <h1>🌍 各國新聞情緒分析</h1>
-    <form id="countryForm">
-      <h5 for="country">請選擇國家：
-      <select id="country" name="country" class="mx-2">
-        <option value="美國">美國</option>
-        <option value="中國">中國</option>
-        <option value="俄羅斯">俄羅斯</option>
-        <option value="烏克蘭">烏克蘭</option>
-        <option value="台灣">台灣</option>
-        <option value="日本">日本</option>
-        <option value="韓國">韓國</option>
-        <option value="英國">英國</option>
-        <option value="法國">法國</option>
-        <option value="德國">德國</option>
-        <option value="加拿大">加拿大</option>
-      </select>
-      <button type="submit" style="weight: 200px;" class="btn btn-primary">查詢</button>
-    </h5>
-    </form>
-</div>  
+<div class="col-lg-12 mb-2">
+    <h1> 各國新聞情緒分析</h1>
+    <p>這個網頁將提供最新的各國新聞情緒分析結果</p>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="h6 text-uppercase mb-0">篩選條件</h3>
+      </div>
+      <div class="card-body">
+        <form id="countryForm">
+          <div class="row align-items-end g-3">
+  
+            <!-- 國家選擇 -->
+            {% comment %} <div class="col-md-3">
+              <label for="country" class="form-label">請選擇國家：</label>
+              <select id="country" name="country" class="form-select">
+                <option value="美國">美國</option>
+                <option value="中國">中國</option>
+                <option value="俄羅斯">俄羅斯</option>
+                <option value="烏克蘭">烏克蘭</option>
+                <option value="台灣" selected>台灣</option>
+                <option value="日本">日本</option>
+                <option value="韓國">韓國</option>
+                <option value="英國">英國</option>
+                <option value="法國">法國</option>
+                <option value="德國">德國</option>
+                <option value="加拿大">加拿大</option>
+              </select>
+            </div> {% endcomment %}
+
+            <div class="mb-3">
+                <label for="countryInput" class="form-label">請輸入或選擇國家：</label>
+                <input list="countryList" id="countryInput" name="country" class="form-control" placeholder="輸入國家" />
+              
+                <datalist id="countryList">
+                  <option value="美國">
+                  <option value="中國">
+                  <option value="俄羅斯">
+                  <option value="烏克蘭">
+                  <option value="台灣">
+                  <option value="日本">
+                  <option value="韓國">
+                  <option value="英國">
+                  <option value="法國">
+                  <option value="德國">
+                  <option value="加拿大">
+                </datalist>
+              
+                <!-- 常用快速按鈕 -->
+                <div class="mt-2">
+                  <button type="button" class="btn btn-outline-secondary btn-sm me-1" onclick="fillCountry('台灣')">台灣</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm me-1" onclick="fillCountry('美國')">美國</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm me-1" onclick="fillCountry('中國')">中國</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm me-1" onclick="fillCountry('烏克蘭')">烏克蘭</button>
+                </div>
+              </div>
+  
+            <!-- 最近多少周 -->
+        <div class="col-md-3">
+            <label class="form-label">最近多少周?</label>
+            <div class="d-flex flex-wrap">
+            {% for i in week_options %}
+            <div class="form-check form-check-inline me-2">
+                <input type="radio" class="form-check-input" name="wkradio" id="week-{{ i }}" value="{{ i }}" {% if i == '2' %}checked{% endif %}>
+                <label class="form-check-label" for="week-{{ i }}">{{ i }}</label>
+            </div>
+            {% endfor %}
+            </div>
+            <div class="form-text">以最新資料時間為準，往前推多少周?</div>
+        </div>
+        
+        <!-- 熱門關鍵字數量 -->
+        <div class="col-md-3">
+            <label class="form-label">熱門關鍵字數量</label>
+            <div class="d-flex flex-wrap">
+            {% for i in keynum_options %}
+            <div class="form-check form-check-inline me-2">
+                <input type="radio" class="form-check-input" name="keynumradio" id="keynum-{{ i }}" value="{{ i }}" {% if i == '5' %}checked{% endif %}>
+                <label class="form-check-label" for="keynum-{{ i }}">{{ i }}</label>
+            </div>
+            {% endfor %}
+            </div>
+            <div class="form-text">要顯示多少個熱門關鍵字？</div>
+        </div>
+  
+  
+            <!-- 查詢按鈕 -->
+            <div class="col-md-1 text-end">
+              <button type="submit" class="btn btn-primary w-100">查詢</button>
+            </div>
+  
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
 
 <div class="col-lg-6 col-md-12 mb-2">
     <div class="card">
@@ -78,6 +153,13 @@
     #drawLineChart {
       max-height: 400px !important;
     }
+    .form-select {
+        background-color: #F2F2F0;
+        border-color: #A65233;
+        color: #260224;
+        font-weight: bold;
+      }
+      
   </style>
   
   
@@ -92,22 +174,33 @@
 <script>
     // 頁面載入時，預設呼叫台灣資料
     window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('country').value = '台灣';  // 預設選台灣
+        document.getElementById('countryInput').value = '台灣';
         form.dispatchEvent(new Event('submit')); // 觸發 submit 事件呼叫後端
   });
+
+  function fillCountry(name) {
+    document.getElementById('countryInput').value = name;
+  }
   
   const form = document.getElementById('countryForm');
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-    const country = document.getElementById('country').value;
-
+    const country = document.getElementById('countryInput').value;
+    const weeks = document.querySelector('input[name="wkradio"]:checked').value;
+    const keynum = document.querySelector('input[name="keynumradio"]:checked').value;
+  
+    const params = new URLSearchParams();
+    params.append('country', country);
+    params.append('weeks', weeks);
+    params.append('keynum', keynum);
+  
     fetch('/feature_db/calculate_feature/', {
       method: 'POST',
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'country=' + encodeURIComponent(country)
+      body: params.toString()
     })
     .then(response => {
       if (!response.ok) {
@@ -116,28 +209,26 @@
       return response.json();
     })
     .then(data => {
-        console.log('後端回傳:', data);
-        if (data.error) {
-          alert(data.error);
-          return;
-        }
-        if (!data.sentiment_distribution || !data.top_keywords) {
-          alert('後端資料不完整，請稍後再試。');
-          return;
-        }
-      
-        drawSentimentChart(data.sentiment_distribution);
-        drawKeywordChart(data.top_keywords);
-      
-        // ✅ 補上這段來畫折線圖
-        if (data.report_trend) {
-            drawLineChart(data.report_trend);
-        }
-      })
+      // 依你之前的畫圖邏輯
+      console.log('後端回傳:', data);
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      if (data.message) {
+        alert(data.message);
+    }
+      drawSentimentChart(data.sentiment_distribution);
+      drawKeywordChart(data.top_keywords);
+      if (data.report_trend) {
+        drawLineChart(data.report_trend);
+      }
+    })
     .catch(err => {
       alert('載入資料失敗：' + err.message);
     });
   });
+  
 
   let sentimentChart = null;
   let keywordChart = null;
@@ -183,7 +274,7 @@
         }]
       },
       options: {
-        indexAxis: 'y',
+        indexAxis: 'x',
         responsive: true,
         plugins: {
           legend: { display: false },
